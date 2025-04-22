@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata: 
-  name: api
+  name: backend
   namespace: three-tier
   labels: 
-    role: api
+    app: backend
     env: demo
 spec: 
   replicas: 2
@@ -15,17 +15,17 @@ spec:
       maxUnavailable: 25%
   selector: 
     matchLabels:
-      role: api
+      app: backend
   template:
     metadata:
       labels:
-        role: api
+        app: backend
     spec:
       imagePullSecrets:
-      - name: ecr-registry-secret
+      - name: my-dockerhub-secret
       containers:
-      - name: api
-        image: 407622020962.dkr.ecr.us-east-1.amazonaws.com/backend:latest
+      - name: backend
+        image: rnjt80/backend:latest
         imagePullPolicy: Always
         env:
           - name: MONGO_CONN_STR
@@ -55,3 +55,16 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
           successThreshold: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: three-tier
+spec: 
+  ports:
+  - port: 3500
+    protocol: TCP
+  type: ClusterIP
+  selector:
+    app: backend
