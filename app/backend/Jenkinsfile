@@ -1,3 +1,4 @@
+@Library("shared_groovy")_
 pipeline {
     environment {
         dockerImageName = "rnjt80/backend"
