@@ -1,0 +1,94 @@
+pipeline {
+    environment {
+        dockerImageName = "rnjt80/backend"
+        docker = "/usr/local/bin/docker"
+        repoUrl = "https://github.com/rnjt80/ThreeTierApp-on-k8s.git"
+        repoBranch = "main"
+        versionfile = "package.json"
+        
+    }
+    agent any 
+    tools {
+        jdk 'jdk'
+        nodejs 'nodejs'
+        dockerTool 'docker'
+    }
+ 
+    stages {
+        stage('Cleaning Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Clone Repo from Git') {
+            steps {
+                script {
+                    gitClone("github", repoUrl, repoBranch)
+                }
+            }
+        }
+        
+        stage("Docker Image Build and Push") {
+            environment {
+               registryCredential = 'dockerhub'
+            }
+            steps {
+               script {
+                    dir('app/backend') {
+                        
+                        echo "Building an image"
+                        def builtImage = docker_Image(versionfile, dockerImageName)
+                        echo "Image tag ${env.ImageTag}"
+                        docker.withRegistry( 'https://registry.hub.docker.com', registryCredential ) {
+                        echo "Pushing image ${builtImage} to dockerHub"
+                        builtImage.push()
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        stage('Update K8s manifest file') {
+            environment {
+                GIT_REPO_NAME = "ThreeTierApp-on-k8s"
+                GIT_USER_NAME = "rnjt80"
+            }
+            steps {
+                dir('k8s/Backend') {
+                    withCredentials([string(credentialsId: 'Github', variable: 'GITHUB_TOKEN')]) {
+                        withEnv(["PATH+GREP=/opt/homebrew/opt/grep/libexec/gnubin"]) {
+                            sh '''
+                                git config user.email "rnjtsangamnere@gmail.com"
+                                git config user.name "${GIT_USER_NAME}"
+                                echo "${ImageTag}"
+                                BUILD_NUMBER=${ImageTag}
+                                echo $BUILD_NUMBER
+                                imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
+                                echo $imageTag
+                                escaped_dockerImageName=$(echo "$dockerImageName" | sed 's|/|\\/|g')
+                                echo $escaped_dockerImageName
+                                sed -i '' "s|${escaped_dockerImageName}:${imageTag}|${escaped_dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
+                                git status
+                                git diff
+                                git add deployment.yaml
+                                git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
+                                git push ${repoUrl} HEAD:${repoBranch}
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+       
+         stage('Deploy to Kubernetes') {
+            steps {
+                dir('k8s/Backend') {
+                    withKubeConfig([credentialsId: 'kubeconfig']) {
+                        sh 'kubectl apply -f deployment.yaml'
+                    }
+                }
+            }
+        }
+    }
+}
