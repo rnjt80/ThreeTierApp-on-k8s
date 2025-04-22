@@ -67,8 +67,6 @@ pipeline {
                                 echo $BUILD_NUMBER
                                 imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
                                 echo $imageTag
-                                //escaped_dockerImageName=$(echo "$dockerImageName" | sed 's|/|\\/|g')
-                                echo $escaped_dockerImageName
                                 sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
                                 git status
                                 git diff
