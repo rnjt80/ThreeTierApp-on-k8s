@@ -6,7 +6,7 @@ pipeline {
         repoUrl = "https://github.com/rnjt80/ThreeTierApp-on-k8s.git"
         repoBranch = "${env.BRANCH_NAME}"
 	changeBranch = "${env.CHANGE_BRANCH}"
-	changeTarget = "${env.TARGET_CHANGE}"
+	changeTarget = "${env.CHANGE_TARGET}"
         versionfile = "package.json"
         
     }
@@ -70,7 +70,7 @@ pipeline {
                                 imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
                                 echo $imageTag 
                                 sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
-                                echo "Target ${changeBranch}"
+                                echo "Target ${changeTarget}"
                                 echo "Branch ${repoBranch}"
                                 git status
                                 git diff
