@@ -25,7 +25,7 @@ pipeline {
         stage('Clone Repo from Git') {
             steps {
                 script {
-                    gitClone("github", repoUrl, repoBranch)
+                    gitClone("github", repoUrl, env.CHANGE_TARGET )
                 }
             }
         }
@@ -77,7 +77,7 @@ pipeline {
                                         git diff
                                         git add deployment.yaml
                                         git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
-                                        git push ${repoUrl} HEAD:${repoBranch}
+                                        git push ${repoUrl} HEAD:${env.CHANGE_TARGET}
                                     '''
                                 } else {
                                     sh '''
