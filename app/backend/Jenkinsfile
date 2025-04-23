@@ -76,7 +76,7 @@ pipeline {
                                         git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
                                         git push ${repoUrl} HEAD:${repoBranch}
                                     '''
-                                } else if (env.CHANGE_TARGET == 'main') {
+                                } else {
                                     sh '''
                                         git config user.email "rnjtsangamnere@gmail.com"
                                         git config user.name "${GIT_USER_NAME}"
