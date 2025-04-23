@@ -32,11 +32,11 @@ spec:
       - name: my-dockerhub-secret
       containers:
       - name: frontend
-        image: rnjt80/frontend:0.1.0
+        image: rnjt80/frontend:0.1.2
         imagePullPolicy: Always
         env:
           - name: REACT_APP_BACKEND_URL
-            value: "http://backend.amanpathakdevops.study/api/tasks"
+            value: "http://app.172.18.0.5.nip.io/api/tasks"
         ports:
         - containerPort: 3000
 ---
@@ -72,3 +72,10 @@ spec:
             name: frontend-service
             port:
               number: 3000
+      - pathType: Prefix
+        path: /api
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 3500
