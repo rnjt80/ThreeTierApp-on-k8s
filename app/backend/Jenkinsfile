@@ -70,7 +70,6 @@ pipeline {
                                 imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
                                 echo $imageTag 
                                 sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
-                                echo "Target ${env.CHANGE_TARGET}"
                                 echo "Branch ${repoBranch}"
                                 git status
                                 git diff
