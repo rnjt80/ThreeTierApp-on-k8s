@@ -5,8 +5,8 @@ pipeline {
         docker = "/usr/local/bin/docker"
         repoUrl = "https://github.com/rnjt80/ThreeTierApp-on-k8s.git"
         repoBranch = "${env.BRANCH_NAME}"
-	changeBranch = "${env.CHANGE_BRANCH}"
-	changeTarget = "${env.CHANGE_TARGET}"
+        changeBranch = "${env.CHANGE_BRANCH}"
+        changeTarget = "${env.CHANGE_TARGET}"
         versionfile = "package.json"
         
     }
@@ -25,6 +25,11 @@ pipeline {
         }
         stage('Clone Repo from Git') {
             steps {
+                echo "BRANCH_NAME: ${env.BRANCH_NAME}"
+                echo "CHANGE_BRANCH: ${env.CHANGE_BRANCH}"
+                echo "TARGET_CHANGE: ${env.TARGET_CHANGE}"
+                echo "changeTarget: ${changeTarget}"
+                
                 script {
                     gitClone("github", repoUrl, changeTarget )
                 }
@@ -58,11 +63,11 @@ pipeline {
                 GIT_USER_NAME = "rnjt80"
             }
             steps {
-            	dir('k8s/Backend') {
-                	withCredentials([string(credentialsId: 'Github', variable: 'GITHUB_TOKEN')]) {
+                dir('k8s/Backend') {
+                    withCredentials([string(credentialsId: 'Github', variable: 'GITHUB_TOKEN')]) {
                         withEnv(["PATH+GREP=/opt/homebrew/opt/grep/libexec/gnubin"]) {
                             sh '''
-                            	git config user.email "rnjtsangamnere@gmail.com"
+                                git config user.email "rnjtsangamnere@gmail.com"
                                 git config user.name "${GIT_USER_NAME}"
                                 echo "${ImageTag}"
                                 BUILD_NUMBER=${ImageTag}
