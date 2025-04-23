@@ -60,28 +60,46 @@ pipeline {
                     dir('k8s/Backend') {
                         withCredentials([string(credentialsId: 'Github', variable: 'GITHUB_TOKEN')]) {
                             withEnv(["PATH+GREP=/opt/homebrew/opt/grep/libexec/gnubin"]) {
-                                sh '''
-                                    git config user.email "rnjtsangamnere@gmail.com"
-                                    git config user.name "${GIT_USER_NAME}"
-                                    echo "${ImageTag}"
-                                    BUILD_NUMBER=${ImageTag}
-                                    echo $BUILD_NUMBER 
-                                    imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
-                                    echo $imageTag 
-                                    sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
-                                    git status
-                                    git diff
-                                    git add deployment.yaml
-                                    git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
-                                    git push ${repoUrl} HEAD:${repoBranch}
-                                '''                  
+                                if (env.BRANCH_NAME == 'main' && env.CHANGE_TARGET == 'main') {
+                                    sh '''
+                                        git config user.email "rnjtsangamnere@gmail.com"
+                                        git config user.name "${GIT_USER_NAME}"
+                                        echo "${ImageTag}"
+                                        BUILD_NUMBER=${ImageTag}
+                                        echo $BUILD_NUMBER 
+                                        imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
+                                        echo $imageTag 
+                                        sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
+                                        git status
+                                        git diff
+                                        git add deployment.yaml
+                                        git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
+                                        git push ${repoUrl} HEAD:${repoBranch}
+                                    '''
+                                } else if (env.CHANGE_TARGET == 'main') {
+                                    sh '''
+                                        git config user.email "rnjtsangamnere@gmail.com"
+                                        git config user.name "${GIT_USER_NAME}"
+                                        echo "${ImageTag}"
+                                        BUILD_NUMBER=${ImageTag}
+                                        echo $BUILD_NUMBER 
+                                        imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
+                                        echo $imageTag 
+                                        sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
+                                        git status
+                                        git diff
+                                        git add deployment.yaml --dry-run 
+                                        git commit -m "Update deployment Image to version ${BUILD_NUMBER}" --dry-run
+                                        git push ${repoUrl} HEAD:${repoBranch} --dry-run
+                                    '''
+
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        
        
          stage('Deploy to Kubernetes') {
             steps {
@@ -90,8 +108,8 @@ pipeline {
                         withKubeConfig([credentialsId: 'kubeconfig']) {
                             if (env.BRANCH_NAME == 'main' && env.CHANGE_TARGET == 'main') {
                                 sh 'kubectl apply -f deployment.yaml'
-                            } else if (env.CHANGE_TARGET = main) {
-                                sh 'kubectl apply -f deployment.yaml --dry-run'
+                            } else if (env.CHANGE_TARGET == 'main') {
+                                sh 'kubectl apply -f deployment.yaml --dry-run=client'
                             }
                         }
                     }
