@@ -75,7 +75,7 @@ pipeline {
                                 git diff
                                 git add deployment.yaml
                                 git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
-                                git push ${repoUrl} HEAD:${env.CHANGE_TARGET}
+                                git push ${repoUrl} HEAD:"${env.CHANGE_TARGET}"
                             '''
                         }
                     }
