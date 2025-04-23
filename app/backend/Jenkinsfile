@@ -6,6 +6,7 @@ pipeline {
         repoUrl = "https://github.com/rnjt80/ThreeTierApp-on-k8s.git"
         repoBranch = "${env.BRANCH_NAME}"
 	changeBranch = "${env.CHANGE_BRANCH}"
+	changeTarget = "${env.TARGET_CHANGE}"
         versionfile = "package.json"
         
     }
@@ -25,7 +26,7 @@ pipeline {
         stage('Clone Repo from Git') {
             steps {
                 script {
-                    gitClone("github", repoUrl, env.CHANGE_BRANCH )
+                    gitClone("github", repoUrl, changeTarget )
                 }
             }
         }
@@ -75,7 +76,7 @@ pipeline {
                                 git diff
                                 git add deployment.yaml
                                 git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
-                                git push ${repoUrl} HEAD:${env.CHANGE_BRANCH}
+                                git push ${repoUrl} HEAD:${changeTarget}
                             '''
                         }
                     }
