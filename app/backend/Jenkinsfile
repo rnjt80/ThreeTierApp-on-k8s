@@ -5,7 +5,7 @@ pipeline {
         docker = "/usr/local/bin/docker"
         repoUrl = "https://github.com/rnjt80/ThreeTierApp-on-k8s.git"
         repoBranch = "${env.BRANCH_NAME}"
-	changeTarget = "${env.CHANGE_TARGET}"
+	changeBranch = "${env.CHANGE_BRANCH}"
         versionfile = "package.json"
         
     }
@@ -71,7 +71,7 @@ pipeline {
                                         imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
                                         echo $imageTag 
                                         sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
-					echo "Target ${changeTarget}"
+					echo "Target ${changeBranch}"
 					echo "Branch ${repoBranch}"
                                         git status
                                         git diff
@@ -89,13 +89,13 @@ pipeline {
                                         imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
                                         echo $imageTag 
                                         sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
-					echo "Target ${changeTarget}"
+					echo "Target ${changeBranch}"
 					echo "Branch ${repoBranch}"
                                         git status
                                         git diff
-                                        git add deployment.yaml --dry-run 
-                                        git commit -m "Update deployment Image to version ${BUILD_NUMBER}" --dry-run
-                                        git push ${repoUrl} HEAD:${repoBranch} --dry-run
+                                        git add deployment.yaml
+                                        git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
+                                        git push ${repoUrl} HEAD:${repoBranch}
                                     '''
                                 }
                             }
