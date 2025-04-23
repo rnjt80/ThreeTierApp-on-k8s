@@ -85,7 +85,7 @@ pipeline {
                                         echo $BUILD_NUMBER 
                                         imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
                                         echo $imageTag 
-                                        sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml --dry-run
+                                        sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
                                         git status
                                         git diff
                                         git add deployment.yaml --dry-run 
