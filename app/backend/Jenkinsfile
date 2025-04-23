@@ -70,13 +70,13 @@ pipeline {
                                 imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
                                 echo $imageTag 
                                 sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
-                                echo "Target ${changeTarget}"
+                                echo "Target ${env.CHANGE_TARGET}"
                                 echo "Branch ${repoBranch}"
                                 git status
                                 git diff
                                 git add deployment.yaml
                                 git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
-                                git push ${repoUrl} HEAD:${env.CHANGE_TARGET}
+                                git push ${repoUrl} HEAD:${env.CHANGE_TARGET} --dry-run
                             '''
                         }
                     }
