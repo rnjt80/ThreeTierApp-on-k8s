@@ -90,7 +90,7 @@ pipeline {
                         withKubeConfig([credentialsId: 'kubeconfig']) {
                             if (env.BRANCH_NAME == 'main' && env.CHANGE_TARGET == 'main') {
                                 sh 'kubectl apply -f deployment.yaml'
-                            } else if (env.CHANGE_TARGET = main) {
+                            } else if (env.CHANGE_TARGET == main) {
                                 sh 'kubectl apply -f deployment.yaml --dry-run'
                             }
                         }
