@@ -27,10 +27,15 @@ pipeline {
             steps {
                 echo "BRANCH_NAME: ${env.BRANCH_NAME}"
                 echo "CHANGE_BRANCH: ${env.CHANGE_BRANCH}"
-                echo "TARGET_CHANGE: ${env.TARGET_CHANGE}"
+                echo "TARGET_CHANGE: ${env.CHANGE_TARGET}"
                 echo "changeTarget: ${changeTarget}"
                 
                 script {
+                    echo "BRANCH_NAME: ${repoBranch}"
+                    echo "CHANGE_BRANCH: ${changeBranch}"
+                    echo "TARGET_CHANGE: ${changeTarget}"
+                    echo "changeTarget: ${changeTarget}"
+
                     gitClone("github", repoUrl, changeTarget )
                 }
             }
