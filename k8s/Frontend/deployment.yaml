@@ -32,7 +32,7 @@ spec:
       - name: my-dockerhub-secret
       containers:
       - name: frontend
-        image: rnjt80/frontend:1.1.4
+        image: rnjt80/frontend:1.1.10
         imagePullPolicy: Always
         env:
           - name: REACT_APP_BACKEND_URL
