@@ -57,7 +57,7 @@ pipeline {
             when {
                 branch 'main' // Or other production branch
             }
-            
+
             environment {
                 GIT_REPO_NAME = "ThreeTierApp-on-k8s"
                 GIT_USER_NAME = "rnjt80"
@@ -73,14 +73,17 @@ pipeline {
                                 BUILD_NUMBER=${ImageTag}
                                 echo $BUILD_NUMBER 
                                 imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
-                                echo $imageTag 
-                                sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
-                                echo "Branch ${repoBranch}"
-                                git status
-                                git diff
-                                git add deployment.yaml
-                                git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
-                                git push ${repoUrl} HEAD:${repoBranch}
+                                echo $imageTag
+                                if (imageTag != $BUILD_NUMBER) {
+                                    sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
+                                
+                                    echo "Branch ${repoBranch}"
+                                    git status
+                                    git diff
+                                    git add deployment.yaml
+                                    git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
+                                    git push ${repoUrl} HEAD:${repoBranch}
+                                }
                             '''
                         }
                     }
