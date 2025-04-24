@@ -26,6 +26,7 @@ pipeline {
         stage('Clone Repo from Git') {
             steps {
                 script {
+                    sh 'echo ${repoBranch}'
                     gitClone("github", repoUrl, repoBranch)
                 }
             }
@@ -53,6 +54,10 @@ pipeline {
         
         
         stage('Update K8s manifest file') {
+            when {
+                branch 'main' // Or other production branch
+            }
+            
             environment {
                 GIT_REPO_NAME = "ThreeTierApp-on-k8s"
                 GIT_USER_NAME = "rnjt80"
@@ -75,7 +80,7 @@ pipeline {
                                 git diff
                                 git add deployment.yaml
                                 git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
-                                git push ${repoUrl} HEAD:${repoBranch} --dry-run
+                                git push ${repoUrl} HEAD:${repoBranch}
                             '''
                         }
                     }
@@ -84,6 +89,10 @@ pipeline {
         }
        
          stage('Deploy to Kubernetes') {
+            when {
+                branch 'main' // Or other production branch
+            }
+
             steps {
                 script {
                     dir('k8s/Backend') {
