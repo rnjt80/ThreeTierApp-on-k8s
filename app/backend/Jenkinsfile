@@ -75,7 +75,7 @@ pipeline {
                                     echo $BUILD_NUMBER 
                                     imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
                                     echo $imageTag
-                                    if (imageTag != $BUILD_NUMBER) {
+                                    if ($imageTag != $BUILD_NUMBER) {
                                         sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
                                     
                                         echo "Branch ${repoBranch}"
