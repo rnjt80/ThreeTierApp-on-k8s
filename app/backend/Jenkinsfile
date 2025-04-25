@@ -66,27 +66,29 @@ pipeline {
                 dir('k8s/Backend') {
                     withCredentials([string(credentialsId: 'Github', variable: 'GITHUB_TOKEN')]) {
                         withEnv(["PATH+GREP=/opt/homebrew/opt/grep/libexec/gnubin"]) {
-                            sh '''
-                                git config user.email "rnjtsangamnere@gmail.com"
-                                git config user.name "${GIT_USER_NAME}"
-                                echo "${ImageTag}"
-                                BUILD_NUMBER=${ImageTag}
-                                echo $BUILD_NUMBER 
-                                imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
-                                echo $imageTag
-                                if (imageTag != $BUILD_NUMBER) {
-                                    sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
-                                
-                                    echo "Branch ${repoBranch}"
-                                    git status
-                                    git diff
-                                    git add deployment.yaml
-                                    git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
-                                    git push ${repoUrl} HEAD:${repoBranch}
-                                } else {
-                                    echo "No change in version"
-                                }
-                            '''
+                            script {
+                                sh '''
+                                    git config user.email "rnjtsangamnere@gmail.com"
+                                    git config user.name "${GIT_USER_NAME}"
+                                    echo "${ImageTag}"
+                                    BUILD_NUMBER=${ImageTag}
+                                    echo $BUILD_NUMBER 
+                                    imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
+                                    echo $imageTag
+                                    if (imageTag != $BUILD_NUMBER) {
+                                        sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
+                                    
+                                        echo "Branch ${repoBranch}"
+                                        git status
+                                        git diff
+                                        git add deployment.yaml
+                                        git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
+                                        git push ${repoUrl} HEAD:${repoBranch}
+                                    } else {
+                                        echo "No change in version"
+                                    }
+                                '''
+                            }
                         }
                     }
                }
