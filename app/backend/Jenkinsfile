@@ -86,7 +86,7 @@ pipeline {
                                         git push ${repoUrl} HEAD:${repoBranch}
                                     else
                                         echo "No change in version"
-                                    
+                                    fi 
                                 '''
                             }
                         }
