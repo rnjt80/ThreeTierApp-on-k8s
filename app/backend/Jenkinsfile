@@ -83,6 +83,8 @@ pipeline {
                                     git add deployment.yaml
                                     git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
                                     git push ${repoUrl} HEAD:${repoBranch}
+                                } else {
+                                    echo "No change in version"
                                 }
                             '''
                         }
