@@ -75,7 +75,7 @@ pipeline {
                                     echo $BUILD_NUMBER 
                                     imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
                                     echo $imageTag
-                                    if ($imageTag != $BUILD_NUMBER) {
+                                    if [ "$imageTag" != "$BUILD_NUMBER" ]; then
                                         sed -i '' "s|${dockerImageName}:${imageTag}|${dockerImageName}:${BUILD_NUMBER}|g" deployment.yaml
                                     
                                         echo "Branch ${repoBranch}"
@@ -84,9 +84,9 @@ pipeline {
                                         git add deployment.yaml
                                         git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
                                         git push ${repoUrl} HEAD:${repoBranch}
-                                    } else {
+                                    else
                                         echo "No change in version"
-                                    }
+                                    
                                 '''
                             }
                         }
