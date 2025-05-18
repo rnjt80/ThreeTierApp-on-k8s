@@ -10,7 +10,7 @@ pipeline {
         versionfile = "package.json"
         
     }
-    agent any 
+    agent docker 
     tools {
         jdk 'jdk'
         nodejs 'nodejs'
