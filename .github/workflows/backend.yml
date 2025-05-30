@@ -1,0 +1,40 @@
+name: Deploy to Kind Cluster
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: any
+
+    steps:
+      # Checkout code
+      - uses: actions/checkout@v4
+
+      # Set up Docker build environment
+      - uses: docker/docker-build-push-action@v4
+        with:
+          context: ./
+          tags: "my-app:latest"
+          push: true
+
+      # Set up Kind cluster (using a suitable action)
+      - uses: container-tools/kind-action@v2.0.4
+        with:
+          version: "v0.24.0"
+
+      # Deploy application (using kubectl or Helm)
+      - name: Deploy application
+        run: |
+          kubectl apply -f ./k8s/deployment.yaml
+          kubectl apply -f ./k8s/service.yaml
+
+      # Optional: Delete Kind cluster
+      - name: Delete Kind cluster
+        run: |
+          kind delete cluster
+          echo "Kind cluster deleted"
+        if: always() # Run this step even if other steps fail
